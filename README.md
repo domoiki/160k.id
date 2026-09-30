@@ -183,6 +183,41 @@ encodes a value rather than a colour and is left untouched by these tools.
 
 ---
 
+# Deployment
+
+Pushed to `github.com/domoiki/160k.id` and connected to a Vercel project, so
+**every push to `main` auto-deploys to production** (typically ~15 s build).
+
+| | |
+|---|---|
+| Production URL | `https://160k.vercel.app` |
+| Repo | `github.com/domoiki/160k.id` |
+| Framework preset | Next.js (auto-detected) — no manual config |
+
+All 12 routes are statically prerendered, so the whole site is served from the
+edge with no server runtime.
+
+### A note on canonical URLs
+
+`sitemap.xml` and the `<link rel="canonical">` tags deliberately point at
+`https://160k.co.id`, the real domain, not at the `*.vercel.app` hostname.
+That is the right call as the end state: attach `160k.co.id` to this Vercel
+project and every canonical in the project becomes correct with no code change.
+
+Until that DNS is attached, the hosted site advertises a canonical that points
+at the old site. That is harmless for a staging URL but worth knowing before
+sharing the `*.vercel.app` link widely. `site.url` in `src/lib/content.ts` is
+the single place to change it if you would rather self-canonicalise.
+
+### Verifying a deployment
+
+```bash
+npm run verify -- https://160k.vercel.app/
+npm run verify:extension -- https://160k.vercel.app/ honor 9334
+```
+
+---
+
 ## Performance
 
 - Static prerendering for all 11 routes.
