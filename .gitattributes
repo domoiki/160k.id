@@ -1,0 +1,12 @@
+# Normalise line endings in the repository so the same file does not show up
+# as modified on Windows and on Unix/macOS checkouts. Windows still gets CRLF
+# in the working tree via core.autocrlf, but the committed blob is always LF.
+* text=auto eol=lf
+
+# Binary assets - never touched
+*.webp binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.pdf binary
