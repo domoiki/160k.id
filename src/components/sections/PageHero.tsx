@@ -38,7 +38,13 @@ export function PageHero({
                     {b.label}
                   </span>
                 ) : (
-                  <Link href={b.href} className="transition-colors hover:text-ink-dim">
+                  <Link
+                    href={b.href}
+                    /* py-1.5 / -my-1.5: an 11px breadcrumb link is 17px tall.
+                       Padding grows the target to 29px; the negative margin
+                       keeps the separators on their original baseline. */
+                    className="py-1.5 -my-1.5 transition-colors hover:text-ink-dim"
+                  >
                     {b.label}
                   </Link>
                 )}

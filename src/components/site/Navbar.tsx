@@ -160,7 +160,7 @@ export function Navbar() {
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav"
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          className="relative -mr-2 flex h-10 w-10 items-center justify-center rounded-[2px] text-ink transition-colors hover:bg-white/5 lg:hidden"
+          className="relative -mr-2 flex h-11 w-11 items-center justify-center rounded-[2px] text-ink transition-colors hover:bg-white/5 lg:hidden"
         >
           <span className="sr-only">{mobileOpen ? "Close menu" : "Open menu"}</span>
           <span aria-hidden className="relative block h-3 w-[18px]">
@@ -187,8 +187,14 @@ export function Navbar() {
       </div>
 
       {/* ---------- mobile sheet ---------- */}
+      {/* `inert` while collapsed. Without it the eleven links inside are still
+          in the tab order and still exposed to assistive tech even though the
+          sheet is clipped to zero height — keyboard users tab into a menu they
+          cannot see, and screen readers announce links that are not on screen.
+          It also stops them being reached by browser find-on-page. */}
       <div
         id="mobile-nav"
+        inert={!mobileOpen}
         className={cn(
           "overflow-hidden border-line transition-[max-height,opacity] duration-400 ease-[var(--ease-out-expo)] lg:hidden",
           mobileOpen
@@ -196,9 +202,14 @@ export function Navbar() {
             : "max-h-0 opacity-0",
         )}
       >
+        {/* `shrink-0` on every child. The nav is a height-capped flex column
+            (max-h-[calc(100dvh-4rem)]) whose content overflows it, and flex
+            items shrink by default — which silently squashed the primary CTA
+            from its declared h-12 down to 24px. The cap should scroll, not
+            compress. */}
         <nav aria-label="Mobile" className="shell flex max-h-[calc(100dvh-4rem)] flex-col gap-1 overflow-y-auto pt-4 pb-8">
           {nav.map((item) => (
-            <div key={item.label} className="border-b border-line pb-3 last:border-0">
+            <div key={item.label} className="shrink-0 border-b border-line pb-3 last:border-0">
               {item.children ? (
                 <>
                   <p className="px-1 pt-2 pb-1 font-mono text-[0.6875rem] tracking-[0.14em] text-faint uppercase">
@@ -233,7 +244,7 @@ export function Navbar() {
               )}
             </div>
           ))}
-          <ButtonLink href="/contact" size="lg" className="mt-5 w-full">
+          <ButtonLink href="/contact" size="lg" className="mt-5 w-full shrink-0">
             Contact us
           </ButtonLink>
         </nav>

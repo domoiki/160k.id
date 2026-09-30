@@ -143,6 +143,55 @@ node scripts/verify-extension-safety.mjs <url> force <port>   # control
 | `force` (control, pre-fix) | yes | 8869 | 32 |
 | `honor` (real behaviour) | **no — skipped** | **0** | **0** |
 
+### `scripts/audit-ui.mjs`
+
+Measures the **rendered** page rather than reading the source, across every
+route at 390 / 834 / 1440 px. Same CDP approach, still no added dependency.
+
+```bash
+npm run dev
+npm run audit:ui -- http://127.0.0.1:3951/
+npm run audit:ui -- http://127.0.0.1:3951/ --vp=mobile --route=/contact
+```
+
+It reports: horizontal overflow (with the offending element named), text
+contrast computed from composited alpha against the real background stack,
+heading order, `<h1>` count, accessible names, missing `alt`, line measure,
+text below 11 px, target sizes, and controls whose **declared** height does not
+survive layout.
+
+Severity is split rather than flattened into one bucket, because "smaller than
+44 px" alone cries wolf over the 30 px range:
+
+| Kind | Meaning |
+|---|---|
+| `TARGET-SIZE-AA` | under 24×24 — WCAG 2.2 SC 2.5.8, AA |
+| `TARGET-SHRUNK` | declares `h-N`, renders less — a layout defect, not a size choice |
+| `TRAPPED-FOCUS` | a collapsed panel whose controls stay in the tab order |
+| `TARGET-SIZE-AAA` | 24–43 px — under the 44 px comfort target, not a violation |
+| `CONTRAST` | below 4.5:1, or 3:1 for large text |
+
+Two details make the results trustworthy rather than decorative:
+
+- **Overflow is measured with `overflow-x` temporarily lifted.** `body` sets
+  `overflow-x: hidden`, which *hides* real overflow instead of fixing it.
+- **The page must settle before it is measured.** The script waits for load,
+  fonts, an `<h1>`, and a document height that stops changing across three
+  samples. An earlier version used a fixed sleep and reported the entire
+  homepage rendering at a third of its declared height while Turbopack was
+  still compiling — a false alarm indistinguishable from a real defect. It now
+  reports `PAGE-NOT-SETTLED` rather than measuring a moving target.
+
+### `scripts/shoot.mjs`
+
+Full-page PNGs of every route at the same three viewports, for looking at a
+layout rather than asserting about it.
+
+```bash
+npm run shoot -- http://127.0.0.1:3951/          # -> .shots/ (gitignored)
+npm run shoot -- http://127.0.0.1:3951/ --vp=mobile
+```
+
 ---
 
 ## Dark Reader and the hydration warning
@@ -263,10 +312,13 @@ public/assets/
 ## Commands
 
 ```bash
-npm run dev      # development server
-npm run build    # production build
-npm run start    # serve the production build
-npm run lint     # eslint
+npm run dev         # development server
+npm run build       # production build
+npm run start       # serve the production build
+npm run lint        # eslint
+npm run verify      # headless hydration / CSP / console check
+npm run audit:ui    # measured UI audit across routes and viewports
+npm run shoot       # full-page screenshots into .shots/
 ```
 
 ## Notes for whoever picks this up

@@ -40,5 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# screenshots produced by scripts/shoot.mjs
+/.shots
+
 .vercel
 .env*

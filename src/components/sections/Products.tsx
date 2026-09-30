@@ -53,7 +53,7 @@ export function Products() {
                 <dl className="mt-6 grid grid-cols-3 gap-3 border-t border-line pt-4">
                   {p.meta.map((m) => (
                     <div key={m.label} className="min-w-0">
-                      <dt className="truncate font-mono text-[9px] tracking-[0.1em] text-faint uppercase">
+                      <dt className="truncate font-mono text-[10px] tracking-[0.1em] text-faint uppercase">
                         {m.label}
                       </dt>
                       <dd className="mt-1.5 truncate font-mono text-[11px] text-ink-dim">{m.value}</dd>

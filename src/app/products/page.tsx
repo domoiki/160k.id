@@ -50,7 +50,7 @@ export default function ProductsPage() {
                     <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-2">
                       {p.meta.map((m) => (
                         <div key={m.label} className="flex items-baseline gap-2">
-                          <dt className="font-mono text-[9px] tracking-[0.1em] text-faint uppercase">
+                          <dt className="font-mono text-[10px] tracking-[0.1em] text-faint uppercase">
                             {m.label}
                           </dt>
                           <dd className="font-mono text-[11px] text-ink-dim">{m.value}</dd>

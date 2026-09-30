@@ -24,7 +24,10 @@ export function Logo({
   return (
     <Link
       href="/"
-      className={cn("group inline-flex items-center gap-2.5", className)}
+      /* py-2 with -my-2: the lockup renders at 28px, which is a thin target on
+         touch. The negative margin grows the hit area to 44px without moving
+         the mark a single pixel or disturbing the surrounding layout. */
+      className={cn("group inline-flex items-center gap-2.5 py-2 -my-2", className)}
       aria-label="160K — home"
     >
       <Image

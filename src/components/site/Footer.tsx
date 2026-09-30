@@ -52,9 +52,12 @@ export function Footer() {
             </p>
 
             <address className="mt-7 space-y-3 text-sm not-italic text-ink-dim">
+              {/* py-1 / -my-1 on the two tappable lines: a bare text link is
+                  only 20px tall, so grows the hit area to 28px while the
+                  address block keeps its original rhythm. */}
               <a
                 href={`mailto:${contact.email}`}
-                className="block w-fit transition-colors hover:text-ink"
+                className="block w-fit py-1 -my-1 transition-colors hover:text-ink"
               >
                 {contact.email}
               </a>
@@ -62,7 +65,7 @@ export function Footer() {
                 href={contact.whatsappHref}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="block w-fit transition-colors hover:text-ink"
+                className="block w-fit py-1 -my-1 transition-colors hover:text-ink"
               >
                 {contact.whatsapp}
               </a>
