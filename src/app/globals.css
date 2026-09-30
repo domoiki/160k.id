@@ -1,0 +1,337 @@
+@import "tailwindcss";
+
+/* ============================================================
+   160K DESIGN TOKENS
+   Palette derived from 160K's own brand assets:
+   - logo red  #FF0000  (sampled from the 160K logo)
+   - brand blue #1D4999 (sampled from the 160K pillar icons)
+   Red carries brand moments. Blue carries the machine layer.
+   ============================================================ */
+
+@theme {
+  /* -- Surfaces ------------------------------------------------ */
+  --color-void: #05070c;
+  --color-abyss: #070a11;
+  --color-surface: #0a0e17;
+  --color-panel: #0e1420;
+  --color-raised: #141b29;
+
+  /* -- Ink ------------------------------------------------------
+     Contrast ratios against --color-void (#05070c), all WCAG AA+:
+     ink 17.79 · ink-dim 9.41 · muted 6.89 · faint 5.11
+     The ramp is ordered, so hierarchy never depends on failing contrast. */
+  --color-ink: #edf1f8;
+  --color-ink-dim: #a7b2c4;
+  --color-muted: #8b98ac;
+  --color-faint: #748197;
+
+  /* -- Lines ---------------------------------------------------- */
+  --color-line: rgba(255, 255, 255, 0.075);
+  --color-line-strong: rgba(255, 255, 255, 0.14);
+
+  /* -- Brand (160K red, from the logo) -------------------------
+     `brand` is the accent/text red (5.40:1 on void — AA).
+     `brand-solid` is the button fill: the vivid #FF2B2B only reaches
+     3.73:1 with white text, so fills step down to a deeper red that
+     clears AA at 5.04:1. The logo itself is untouched. */
+  --color-brand: #ff2b2b;
+  --color-brand-bright: #ff4d4d;
+  --color-brand-deep: #c81414;
+  --color-brand-solid: #d91f1f;
+  --color-brand-solid-hover: #e52626;
+  --color-brand-wash: rgba(255, 43, 43, 0.12);
+
+  /* -- Infrastructure (160K blue, lifted for dark UI) ---------- */
+  --color-infra: #4c8dff;
+  --color-infra-bright: #7aabff;
+  --color-infra-deep: #1d4999;
+  --color-infra-wash: rgba(76, 141, 255, 0.12);
+
+  /* -- Semantic (used only where meaning demands it) ----------- */
+  --color-ok: #35c88a;
+  --color-warn: #e8a33d;
+  --color-danger: #ff5a5a;
+
+  /* -- Type ----------------------------------------------------- */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --text-display: clamp(2.5rem, 1.35rem + 4.6vw, 5.25rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.035em;
+
+  --text-h2: clamp(1.9rem, 1.25rem + 2.5vw, 3.25rem);
+  --text-h2--line-height: 1.04;
+  --text-h2--letter-spacing: -0.03em;
+
+  --text-h3: clamp(1.25rem, 1.05rem + 0.8vw, 1.75rem);
+  --text-h3--line-height: 1.2;
+  --text-h3--letter-spacing: -0.02em;
+
+  --text-lede: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+  --text-lede--line-height: 1.6;
+
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1;
+  --text-label--letter-spacing: 0.14em;
+
+  /* -- Radius: a deliberate scale, not one value everywhere ---- */
+  --radius-tech: 2px;
+  --radius-panel: 8px;
+  --radius-card: 12px;
+
+  /* -- Motion ---------------------------------------------------- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* sticky header height + breathing room for in-page targets */
+    scroll-padding-top: 6rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-void);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-brand);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-infra);
+    outline-offset: 3px;
+    border-radius: var(--radius-tech);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-raised) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-raised);
+    border-radius: 999px;
+    border: 3px solid var(--color-void);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #1e2738;
+  }
+}
+
+/* ============================================================
+   COMPONENT UTILITIES
+   Deliberately few. Everything else is composed in JSX.
+   ============================================================ */
+
+@utility shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 75rem; /* 1200px */
+  padding-inline: 1.25rem;
+  @media (min-width: 48rem) {
+    padding-inline: 2rem;
+  }
+  @media (min-width: 80rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Slow-drifting technical grid. Reads as infrastructure, not decoration. */
+@utility xk-grid {
+  background-image:
+    linear-gradient(to right, var(--color-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@utility xk-grid-fade {
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 35%, #000 35%, transparent 78%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 35%, #000 35%, transparent 78%);
+}
+
+/* Hairline top edge used to separate stacked layers in the architecture view */
+@utility xk-rule {
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    var(--color-line-strong) 20%,
+    var(--color-line-strong) 80%,
+    transparent
+  );
+  height: 1px;
+}
+
+/* Soft top-down glow behind imagery. Lives in CSS rather than an inline
+   style: browser extensions that rewrite inline styles (Dark Reader among
+   them) are then given nothing to mutate, which removes a class of
+   hydration mismatch. */
+@utility xk-plate-glow {
+  background-image: radial-gradient(
+    120% 80% at 50% 0%,
+    rgba(76, 141, 255, 0.14),
+    transparent 70%
+  );
+}
+
+/* The packet travelling the signal bus. */
+@utility xk-signal-dot {
+  offset-path: path("M 0 0 L 0 40");
+  animation: xk-signal 3.6s var(--ease-out-expo) infinite;
+}
+
+@utility xk-panel {
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0) 60%),
+    var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-panel);
+}
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+
+@keyframes xk-drift {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      64px 64px,
+      64px 64px;
+  }
+}
+
+@keyframes xk-pulse-node {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.35);
+  }
+}
+
+/* A packet travelling the signal path */
+@keyframes xk-signal {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes xk-dash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+@keyframes xk-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0;
+  }
+}
+
+@keyframes xk-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@utility xk-animate-drift {
+  animation: xk-drift 26s linear infinite;
+}
+@utility xk-animate-blink {
+  animation: xk-blink 1.15s steps(1, end) infinite;
+}
+/* Restrained status pulse. Deliberately slower and lower-amplitude than
+   Tailwind's animate-ping, which reads as an alert rather than a heartbeat. */
+@utility xk-animate-pulse {
+  animation: xk-pulse-node 2.6s ease-in-out infinite;
+}
+
+/* Section entrance. Fire-once, not on every scroll. */
+@utility xk-rise {
+  animation: xk-rise 0.75s var(--ease-out-expo) both;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   Kill the ambient loops entirely; keep opacity so nothing
+   that carries meaning ever becomes invisible.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .xk-animate-drift,
+  .xk-animate-blink {
+    animation: none !important;
+  }
+}
