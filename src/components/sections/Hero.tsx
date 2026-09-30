@@ -14,9 +14,13 @@ export function Hero() {
       </div>
 
       <div className="shell">
-        <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-10">
+        {/* min-w-0 on both children: a grid item defaults to min-width:auto,
+            which resolves to its own min-content width and would let either
+            column push past its track. Combined with the narrow display scale
+            at `lg`, that keeps the headline inside the copy column. */}
+        <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-8">
           {/* ---- copy ---- */}
-          <div className="lg:col-span-5">
+          <div className="min-w-0 lg:col-span-6">
             <p className="mb-6 flex items-center gap-3 font-mono text-[0.6875rem] tracking-[0.14em] text-muted uppercase">
               <span aria-hidden className="relative flex h-1.5 w-1.5">
                 <span className="xk-animate-pulse absolute inline-flex h-full w-full rounded-full bg-brand" />
@@ -25,7 +29,16 @@ export function Hero() {
               Cloud communication provider
             </p>
 
-            <h1 className="text-display font-semibold text-ink">
+            {/* text-display full-bleed while stacked; the narrow variant once the
+                panel sits beside it.
+
+                Deliberately no overflow-wrap/break-words here. It would stop
+                the overlap by breaking "Communication" mid-word, and it would
+                also stop TEXT-SPILL in audit-ui.mjs from ever seeing this
+                element — turning the guard into a blind spot on exactly the
+                heading it exists to protect. A headline that fits is better
+                than one that is allowed to break. */}
+            <h1 className="text-display font-semibold text-ink lg:text-display-narrow">
               Communication infrastructure for{" "}
               <span className="text-ink-dim">modern businesses.</span>
             </h1>
@@ -47,7 +60,7 @@ export function Hero() {
           </div>
 
           {/* ---- technical panel ---- */}
-          <div className="relative lg:col-span-7 lg:pl-6">
+          <div className="relative min-w-0 lg:col-span-6 lg:pl-2">
             {/* the signal thread: leaves the panel and descends the page */}
             <div aria-hidden className="absolute top-1/2 -right-3 hidden h-[calc(100%+8rem)] w-px bg-gradient-to-b from-transparent via-line-strong to-transparent xl:block" />
             <SmppTranscript className="xk-rise" />

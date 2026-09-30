@@ -60,6 +60,25 @@
   --text-display--line-height: 0.98;
   --text-display--letter-spacing: -0.035em;
 
+  /* The hero headline is the one place a viewport-fluid display size has to
+     fit something narrower than the shell: at `lg` the hero splits into
+     12 columns and the copy gets 5 of them (~445px at 1440). Sized off the
+     viewport alone it reaches 5.25rem there, and its longest line measures
+     ~591px — wider than its own column. Grid items default to
+     `min-width: auto` (min-content), so the column tries to grow, the
+     section's `overflow-hidden` clips the spill, and the text is painted
+     over the panel. The horizontal-overflow check cannot see this: the
+     document never gets wider, the content just lands somewhere it must not.
+     This token is the same scale with a ceiling that fits the column. The
+     ceiling is 3.5rem because the column stops growing at 1280 (the shell
+     caps at 75rem) while a `vw` term keeps climbing — the cap, not the
+     fluid range, is what binds on a large display. The longest line in this
+     headline measures ~8.96em wide, so 3.5em-type leaves ~40px of slack in
+     a 544px track; 4.5rem would need 645px and overflow again. */
+  --text-display-narrow: clamp(2.25rem, 1.1rem + 2.9vw, 3.5rem);
+  --text-display-narrow--line-height: 1;
+  --text-display-narrow--letter-spacing: -0.03em;
+
   --text-h2: clamp(1.9rem, 1.25rem + 2.5vw, 3.25rem);
   --text-h2--line-height: 1.04;
   --text-h2--letter-spacing: -0.03em;

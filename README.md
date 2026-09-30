@@ -146,7 +146,8 @@ node scripts/verify-extension-safety.mjs <url> force <port>   # control
 ### `scripts/audit-ui.mjs`
 
 Measures the **rendered** page rather than reading the source, across every
-route at 390 / 834 / 1440 px. Same CDP approach, still no added dependency.
+route at 390 / 834 / 1440 / 1920 px. Same CDP approach, still no added
+dependency.
 
 ```bash
 npm run dev
@@ -155,10 +156,10 @@ npm run audit:ui -- http://127.0.0.1:3951/ --vp=mobile --route=/contact
 ```
 
 It reports: horizontal overflow (with the offending element named), text
-contrast computed from composited alpha against the real background stack,
-heading order, `<h1>` count, accessible names, missing `alt`, line measure,
-text below 11 px, target sizes, and controls whose **declared** height does not
-survive layout.
+spill, contrast computed from composited alpha against the real background
+stack, heading order, `<h1>` count, accessible names, missing `alt`, line
+measure, text below 11 px, target sizes, and controls whose **declared** height
+does not survive layout.
 
 Severity is split rather than flattened into one bucket, because "smaller than
 44 px" alone cries wolf over the 30 px range:
@@ -168,19 +169,44 @@ Severity is split rather than flattened into one bucket, because "smaller than
 | `TARGET-SIZE-AA` | under 24×24 — WCAG 2.2 SC 2.5.8, AA |
 | `TARGET-SHRUNK` | declares `h-N`, renders less — a layout defect, not a size choice |
 | `TRAPPED-FOCUS` | a collapsed panel whose controls stay in the tab order |
+| `TEXT-SPILL` | text wider than its own box, clipped or overlapped by a neighbour |
 | `TARGET-SIZE-AAA` | 24–43 px — under the 44 px comfort target, not a violation |
 | `CONTRAST` | below 4.5:1, or 3:1 for large text |
 
-Two details make the results trustworthy rather than decorative:
+Four details make the results trustworthy rather than decorative:
 
 - **Overflow is measured with `overflow-x` temporarily lifted.** `body` sets
   `overflow-x: hidden`, which *hides* real overflow instead of fixing it.
+- **`TEXT-SPILL` exists because the overflow check structurally cannot see
+  this class of bug.** When a fluid headline outgrows its grid column, the
+  grid item's `min-width: auto` tries to grow, an `overflow-hidden` ancestor
+  clips the spill, and the text is painted over its neighbour — while
+  `document.scrollWidth` stays exactly at the viewport width. Nothing
+  overflows; something overlaps. Comparing `scrollWidth` to `clientWidth`
+  catches it. `text-overflow: ellipsis` is exempt, since truncation is a
+  deliberate choice there.
 - **The page must settle before it is measured.** The script waits for load,
   fonts, an `<h1>`, and a document height that stops changing across three
   samples. An earlier version used a fixed sleep and reported the entire
   homepage rendering at a third of its declared height while Turbopack was
   still compiling — a false alarm indistinguishable from a real defect. It now
   reports `PAGE-NOT-SETTLED` rather than measuring a moving target.
+- **A filter that matches nothing is an error, not a clean result.** The
+  flags are parsed by name; an earlier version sliced a fixed offset out of
+  `--route=/`, got `=/`, matched zero routes and printed a confident
+  "0 findings" that meant only that it had looked at nothing. It now exits
+  with the valid values listed.
+
+### `scripts/probe-hero.mjs`
+
+Sweeps 13 viewport widths and reports whether the hero headline fits its own
+grid column, with the numbers on both sides. This is how the overlap above was
+diagnosed and how the clamp was tuned — the type scale here is a function of
+the viewport *and* the column, which arithmetic in a comment gets wrong.
+
+```bash
+node scripts/probe-hero.mjs http://127.0.0.1:3951/
+```
 
 ### `scripts/shoot.mjs`
 

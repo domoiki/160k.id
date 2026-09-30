@@ -19,22 +19,34 @@ import { join } from "node:path";
 const EDGE = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
 const PORT = 9339;
 const BASE = process.argv[2] ?? "http://127.0.0.1:3951/";
-const onlyVp = process.argv.find((a) => a.startsWith("--vp="))?.slice(5);
-const onlyRoute = process.argv.find((a) => a.startsWith("--route="))?.slice(7);
+/* Read `--name=value` flags by name, not by a hand-counted offset.
+   `--route=/`.slice(7) is "=/", not "/": the wrong offset silently matches
+   nothing, the run audits zero routes, and it reports a confident
+   "0 findings" that means only that it looked at nothing. */
+const flag = (name) => {
+  const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
+  return hit ? hit.slice(name.length + 3) : undefined;
+};
+const onlyVp = flag("vp");
+const onlyRoute = flag("route");
 
 const ROUTES = ["/", "/products", "/products/a2p-messaging", "/api", "/about", "/contact"];
 const VIEWPORTS = [
   { name: "mobile", width: 390, height: 844, mobile: true },
   { name: "tablet", width: 834, height: 1112, mobile: true },
   { name: "desktop", width: 1440, height: 900, mobile: false },
+  /* Past the shell's 75rem cap the fluid type terms keep climbing while the
+     column stops growing, so a ceiling that fits at 1440 can still overflow at
+     1920. That range was untested and is exactly where a bad clamp hides. */
+  { name: "wide", width: 1920, height: 1080, mobile: false },
 ];
 
 /* Runs inside the page. Returns a JSON string so returnByValue can carry it. */
 const AUDIT = String.raw`
 (() => {
   const out = { overflow: null, offscreen: [], tapTargets: [], tinyTargets: [], shrunk: [],
-                trappedFocus: [], tinyText: [], contrast: [], headings: [], unnamed: [],
-                noAlt: [], measure: [],
+                trappedFocus: [], tinyText: [], contrast: [], spill: [], headings: [],
+                unnamed: [], noAlt: [], measure: [],
                 bodyOverflowX: getComputedStyle(document.body).overflowX };
 
   const sel = (el) => {
@@ -229,8 +241,28 @@ const AUDIT = String.raw`
       }
     }
 
-    /* Measure: only for real prose blocks, capped at a comfortable width. */
     const tag = el.tagName;
+
+    /* Content wider than its own box.
+     *
+     * This is the check the horizontal-overflow test structurally cannot make.
+     * When a fluid headline outgrows its grid column, the grid item's
+     * min-width:auto (min-content) tries to grow, an overflow-hidden ancestor
+     * clips the spill, and the text is painted over whatever sits beside it —
+     * while document.scrollWidth stays exactly at the viewport width. Nothing
+     * overflows; something overlaps. Comparing scrollWidth against clientWidth
+     * catches it directly. Limited to headings and prose, where an
+     * unbreakable word is the realistic cause and false positives are not.
+     * text-overflow:ellipsis is exempt: truncation is a deliberate choice
+     * there, and those elements report a scrollWidth larger than their box by
+     * design. */
+    if (/^(H1|H2|H3|H4|H5|H6|P|LI|DD|DT)$/.test(tag)
+        && cs.textOverflow !== "ellipsis"
+        && el.scrollWidth > el.clientWidth + 1) {
+      out.spill.push({ sel: sel(el), scrollW: el.scrollWidth, clientW: el.clientWidth });
+    }
+
+    /* Measure: only for real prose blocks, capped at a comfortable width. */
     if ((tag === "P" || tag === "LI" || tag === "DD") && fs >= 15) {
       const chars = el.textContent.trim().length;
       if (chars > 60) {
@@ -353,7 +385,27 @@ await send("Runtime.enable");
 
 const findings = [];
 
-for (const vp of VIEWPORTS.filter((v) => !onlyVp || v.name === onlyVp)) {
+const viewports = VIEWPORTS.filter((v) => !onlyVp || v.name === onlyVp);
+const routes = ROUTES.filter((r) => !onlyRoute || r === onlyRoute);
+
+/* A filter that matches nothing must say so. Silently auditing zero pages and
+   printing "0 findings" is indistinguishable from a clean site. */
+if (!viewports.length || !routes.length) {
+  console.error(
+    `No match: --vp=${onlyVp ?? "(unset)"} matched ${viewports.length}/${VIEWPORTS.length} viewports, ` +
+      `--route=${onlyRoute ?? "(unset)"} matched ${routes.length}/${ROUTES.length} routes.`,
+  );
+  console.error(`Known viewports: ${VIEWPORTS.map((v) => v.name).join(", ")}`);
+  console.error(`Known routes:    ${ROUTES.join(", ")}`);
+  process.exit(2);
+}
+if (viewports.length * routes.length < VIEWPORTS.length * ROUTES.length) {
+  console.error(
+    `Auditing a subset: ${routes.length} route(s) x ${viewports.length} viewport(s).`,
+  );
+}
+
+for (const vp of viewports) {
   await send("Emulation.setDeviceMetricsOverride", {
     width: vp.width,
     height: vp.height,
@@ -361,7 +413,7 @@ for (const vp of VIEWPORTS.filter((v) => !onlyVp || v.name === onlyVp)) {
     mobile: vp.mobile,
   });
 
-  for (const route of ROUTES.filter((r) => !onlyRoute || r === onlyRoute)) {
+  for (const route of routes) {
     await send("Page.navigate", { url: BASE.replace(/\/$/, "") + route });
 
     const ready = await send("Runtime.evaluate", {
@@ -418,6 +470,9 @@ for (const vp of VIEWPORTS.filter((v) => !onlyVp || v.name === onlyVp)) {
 
     if (a.contrast.length)
       add("CONTRAST", a.contrast.map((c) => `${c.sel} ${c.ratio}:1 (need ${c.need}) ${c.color}`).slice(0, 6).join(" · "), "error");
+
+    if (a.spill.length)
+      add("TEXT-SPILL", a.spill.map((s) => `${s.sel} content ${s.scrollW}px in a ${s.clientW}px box`).join(" · "), "error");
 
     if (a.measure.length)
       add("MEASURE", a.measure.map((m) => `${m.sel} ~${m.cpl}cpl`).join(" · "), "warn");
