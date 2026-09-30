@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "verify": "node scripts/verify-hydration.mjs",
+    "verify:extension": "node scripts/verify-extension-safety.mjs"
   },
   "dependencies": {
     "next": "16.3.7",
