@@ -31,7 +31,7 @@ export function FinalCta() {
             </ButtonLink>
           </div>
 
-          <p className="mt-10 font-mono text-[11px] text-faint">
+          <p className="mt-10 font-mono text-[12px] text-faint">
             {site.legalName} · {contact.addressLines[1]}, {contact.addressLines[2]}
           </p>
         </div>

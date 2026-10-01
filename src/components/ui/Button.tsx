@@ -21,9 +21,12 @@ const variants: Record<Variant, string> = {
   quiet: "text-ink-dim hover:text-ink",
 };
 
+/* sm is 32px because it only ever appears inside a dense desktop bar, where the
+   surrounding nav links set the row height. md and lg are 40 and 48px, above the
+   44px comfort target at lg and within reach of it at md. */
 const sizes: Record<Size, string> = {
   sm: "h-8 px-3.5 text-[0.8125rem]",
-  md: "h-10 px-5 text-[0.9375rem]",
+  md: "h-11 px-5 text-[0.9375rem]",
   lg: "h-12 px-6 text-base",
 };
 

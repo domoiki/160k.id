@@ -90,8 +90,13 @@
   --text-lede: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
   --text-lede--line-height: 1.6;
 
-  --text-label: 0.6875rem;
-  --text-label--line-height: 1;
+  /* 12px, not 11. These are the eyebrow and metadata labels — the smallest
+     text on the site. At 11px they were legible only at desktop pixel density,
+     and the tracking that makes 0.14em look intentional at 12px is what made
+     them readable at 11. 12px is the floor where an uppercase mono label stops
+     being decoration and starts being readable. */
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.15;
   --text-label--letter-spacing: 0.14em;
 
   /* -- Radius: a deliberate scale, not one value everywhere ---- */

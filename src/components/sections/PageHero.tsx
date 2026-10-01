@@ -29,7 +29,7 @@ export function PageHero({
 
       <div className="shell">
         <nav aria-label="Breadcrumb" className="mb-8">
-          <ol className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-faint">
+          <ol className="flex flex-wrap items-center gap-2 font-mono text-[12px] text-faint">
             {breadcrumb.map((b, i) => (
               <li key={b.href} className="flex items-center gap-2">
                 {i > 0 ? <span aria-hidden>/</span> : null}
@@ -43,7 +43,7 @@ export function PageHero({
                     /* py-1.5 / -my-1.5: an 11px breadcrumb link is 17px tall.
                        Padding grows the target to 29px; the negative margin
                        keeps the separators on their original baseline. */
-                    className="py-1.5 -my-1.5 transition-colors hover:text-ink-dim"
+                    className="inline-block py-2.5 transition-colors hover:text-ink-dim"
                   >
                     {b.label}
                   </Link>

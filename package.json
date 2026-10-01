@@ -9,6 +9,9 @@
     "lint": "eslint",
     "verify": "node scripts/verify-hydration.mjs",
     "verify:extension": "node scripts/verify-extension-safety.mjs",
+    "verify:nav": "node scripts/verify-nav.mjs",
+    "verify:nav:traverse": "node scripts/verify-nav-traverse.mjs",
+    "verify:nav:position": "node scripts/verify-nav-position.mjs",
     "audit:ui": "node scripts/audit-ui.mjs",
     "shoot": "node scripts/shoot.mjs"
   },

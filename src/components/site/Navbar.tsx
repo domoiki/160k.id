@@ -8,6 +8,17 @@ import { ButtonLink } from "@/components/ui/Button";
 import { nav } from "@/lib/content";
 import { cn } from "@/lib/cn";
 
+/* Grace period before a hovered flyout closes.
+
+   The trigger and the panel are 12px apart, and crossing that gap fires
+   `mouseleave` — measured: leave at 5ms, closed at 154ms, while the pointer
+   needed longer than that to arrive. A pointer crossing a visible gap needs
+   roughly 200ms; anything less closes the menu mid-gesture, so the user sees it
+   vanish before they can click. 320ms is the usual figure for a flyout that
+   must survive the trip; it costs nothing when they genuinely leave, because
+   nothing is visible while they are on their way to somewhere else. */
+const CLOSE_GRACE_MS = 320;
+
 export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -49,13 +60,18 @@ export function Navbar() {
   useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
 
   const scheduleClose = useCallback(() => {
-    if (closeTimer.current) clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => setOpenMenu(null), 140);
-  }, []);
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+      closeTimer.current = setTimeout(() => setOpenMenu(null), CLOSE_GRACE_MS);
+    }, []);
 
-  const cancelClose = useCallback(() => {
-    if (closeTimer.current) clearTimeout(closeTimer.current);
-  }, []);
+    const cancelClose = useCallback(() => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+    }, []);
+
+  /* Escape and pointer-focus both close the menu, and focus has to be able to
+     land on the trigger again afterwards without that immediately reopening
+     it. One flag absorbs that round trip. */
+  const suppressFocusOpen = useRef(false);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
@@ -74,27 +90,82 @@ export function Navbar() {
 
         {/* ---------- desktop ---------- */}
         <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
-          {nav.map((item) =>
-            item.children ? (
+          {nav.map((item) => {
+            if (!item.children) {
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex h-10 items-center rounded-[2px] px-3 text-sm transition-colors duration-200",
+                    isActive(item.href) ? "text-ink" : "text-ink-dim hover:text-ink",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            }
+
+            const open = openMenu === item.label;
+
+            return (
               <div
                 key={item.label}
                 className="relative"
-                onMouseEnter={() => { cancelClose(); setOpenMenu(item.label); }}
                 onMouseLeave={scheduleClose}
-              >
-                <button
-                  type="button"
-                  aria-expanded={openMenu === item.label}
-                  aria-haspopup="true"
-                  onClick={() =>
-                    setOpenMenu((v) => (v === item.label ? null : item.label))
+                onBlur={(e) => {
+                  /* Focus left the whole widget rather than moving between the
+                     trigger and the panel it owns. Without this, tabbing past an
+                     open menu left it open over unrelated content. */
+                  if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+                    setOpenMenu(null);
                   }
-                  onFocus={() => { cancelClose(); setOpenMenu(item.label); }}
+                }}
+                onKeyDown={(e) => {
+                  if (e.key !== "Escape") return;
+                  setOpenMenu(null);
+                  /* Send focus back to the trigger rather than dropping it on
+                     <body>, which strands keyboard users mid-page. */
+                  suppressFocusOpen.current = true;
+                  (e.currentTarget.querySelector("a") as HTMLAnchorElement | null)?.focus();
+                }}
+              >
+                {/* The trigger is a real link to /products, and hover opens the
+                    flyout alongside it.
+
+                    It used to be a <button> that toggled, which could never
+                    appear to work. A pointer click focuses a button on
+                    mousedown, so onFocus opened the flyout and the click that
+                    followed toggled it straight back shut — open and shut inside
+                    one gesture. Once hover was taken into account the same
+                    conflict showed up differently: hover opened it, then the
+                    click closed it. Both are one bug — a toggle fighting a menu
+                    that something else had already opened — and neither ordering
+                    fixes it. A link cannot cancel what hovering did, so the
+                    conflict is gone rather than reordered.
+
+                    Touch is unaffected either way: this nav is lg:flex, and
+                    mobile has its own sheet listing every child explicitly. */}
+                <Link
+                  href={item.href}
+                  aria-expanded={open}
+                  onMouseEnter={() => { cancelClose(); setOpenMenu(item.label); }}
+                  onFocus={(e) => {
+                    /* Only keyboard focus opens it. :focus-visible is the
+                       browser's own answer to "was this keyboard focus", so it
+                       separates the two paths without tracking pointers. */
+                    if (suppressFocusOpen.current) {
+                      suppressFocusOpen.current = false;
+                      return;
+                    }
+                    if (e.target.matches(":focus-visible")) {
+                      cancelClose();
+                      setOpenMenu(item.label);
+                    }
+                  }}
                   className={cn(
-                    "flex h-9 items-center gap-1.5 rounded-[2px] px-3 text-sm transition-colors duration-200",
-                    openMenu === item.label || isActive(item.href)
-                      ? "text-ink"
-                      : "text-ink-dim hover:text-ink",
+                    "flex h-10 items-center gap-1.5 rounded-[2px] px-3 text-sm transition-colors duration-200",
+                    open || isActive(item.href) ? "text-ink" : "text-ink-dim hover:text-ink",
                   )}
                 >
                   {item.label}
@@ -106,15 +177,29 @@ export function Navbar() {
                     aria-hidden
                     className={cn(
                       "text-faint transition-transform duration-200",
-                      openMenu === item.label && "rotate-180",
+                      open && "rotate-180",
                     )}
                   >
                     <path d="M1 1l3.5 3.5L8 1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
                   </svg>
-                </button>
+                </Link>
 
-                {openMenu === item.label ? (
-                  <div className="absolute top-[calc(100%+0.75rem)] left-1/2 w-[30rem] -translate-x-1/2 pt-3">
+                {open ? (
+                  /* `absolute top-full`, with the 12px offset moved from `top` into
+                     `padding-top`. The band between the trigger and the panel now
+                     belongs to the hover target instead of belonging to neither
+                     element. Measured before this change: `mouseleave` fired at 5ms
+                     and the flyout closed at 154ms, while the pointer needed longer
+                     than that to cross — so the menu always vanished mid-gesture.
+
+                     Still `w-[30rem]` and still centred on the trigger, so the panel
+                     renders in exactly the same place. The 12px is padding now, not
+                     dead space. `onMouseEnter` re-cancels the close if the pointer
+                     arrives after the timer was armed. */
+                  <div
+                    className="absolute left-1/2 top-full w-[30rem] -translate-x-1/2 pt-3"
+                    onMouseEnter={cancelClose}
+                  >
                     <div className="xk-panel overflow-hidden p-1.5 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.9)]">
                       {item.children.map((child) => (
                         <Link
@@ -132,23 +217,12 @@ export function Navbar() {
                   </div>
                 ) : null}
               </div>
-            ) : (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex h-9 items-center rounded-[2px] px-3 text-sm transition-colors duration-200",
-                  isActive(item.href) ? "text-ink" : "text-ink-dim hover:text-ink",
-                )}
-              >
-                {item.label}
-              </Link>
-            ),
-          )}
+            );
+          })}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <ButtonLink href="/contact" size="sm">
+          <ButtonLink href="/contact" size="md">
             Contact us
           </ButtonLink>
         </div>
@@ -212,7 +286,7 @@ export function Navbar() {
             <div key={item.label} className="shrink-0 border-b border-line pb-3 last:border-0">
               {item.children ? (
                 <>
-                  <p className="px-1 pt-2 pb-1 font-mono text-[0.6875rem] tracking-[0.14em] text-faint uppercase">
+                  <p className="px-1 pt-2 pb-1 font-mono text-[12px] tracking-[0.14em] text-faint uppercase">
                     {item.label}
                   </p>
                   <div className="grid gap-0.5">

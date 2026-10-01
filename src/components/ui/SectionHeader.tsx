@@ -25,7 +25,7 @@ export function SectionHeader({
   return (
     <header className={cn(align === "center" && "flex flex-col items-center text-center", className)}>
       {rail ? (
-        <div className="mb-5 flex items-center gap-3 font-mono text-[0.6875rem] tracking-[0.14em] text-muted uppercase">
+        <div className="mb-5 flex items-center gap-3 font-mono text-[12px] tracking-[0.14em] text-muted uppercase">
           <span aria-hidden className="inline-block h-px w-6 bg-brand" />
           <span>{rail}</span>
         </div>

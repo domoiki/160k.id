@@ -33,13 +33,13 @@ export function Developer() {
         {/* ---- spec sheet: one panel, two regions, split by a hairline ---- */}
         <div className="mt-14 overflow-hidden rounded-[var(--radius-panel)] border border-line bg-surface">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-white/[0.015] px-4 py-3 sm:px-6">
-            <p className="font-mono text-[11px] text-muted">
+            <p className="font-mono text-[12px] text-muted">
               <span className="text-ink">{smpp.title}</span>
               <span className="text-faint">
                 {" "}· rev {smpp.revision} · {smpp.date}
               </span>
             </p>
-            <span className="rounded-[2px] border border-line-strong px-2 py-1 font-mono text-[10px] tracking-[0.1em] text-muted uppercase">
+            <span className="rounded-[2px] border border-line-strong px-2 py-1 font-mono text-[12px] tracking-[0.1em] text-muted uppercase">
               public spec
             </span>
           </div>
@@ -47,7 +47,7 @@ export function Developer() {
           <div className="grid lg:grid-cols-2">
             {/* connection parameters */}
             <div className="border-line lg:border-r">
-              <p className="border-b border-line px-4 py-3 font-mono text-[10px] tracking-[0.14em] text-faint uppercase sm:px-6">
+              <p className="border-b border-line px-4 py-3 font-mono text-[12px] tracking-[0.14em] text-faint uppercase sm:px-6">
                 Connection binding
               </p>
               <dl>
@@ -56,8 +56,8 @@ export function Developer() {
                     key={row.field}
                     className="grid grid-cols-[minmax(0,7.5rem)_1fr] gap-x-4 border-b border-line px-4 py-3 last:border-b-0 sm:px-6"
                   >
-                    <dt className="font-mono text-[11px] text-muted sm:text-xs">{row.field}</dt>
-                    <dd className="font-mono text-[11px] text-ink sm:text-xs">{row.value}</dd>
+                    <dt className="font-mono text-[12px] text-muted sm:text-xs">{row.field}</dt>
+                    <dd className="font-mono text-[12px] text-ink sm:text-xs">{row.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -65,7 +65,7 @@ export function Developer() {
 
             {/* error codes */}
             <div>
-              <p className="border-b border-line px-4 py-3 font-mono text-[10px] tracking-[0.14em] text-faint uppercase sm:px-6">
+              <p className="border-b border-line px-4 py-3 font-mono text-[12px] tracking-[0.14em] text-faint uppercase sm:px-6">
                 Error codes
               </p>
               <dl className="max-h-[24rem] overflow-y-auto">
@@ -74,7 +74,7 @@ export function Developer() {
                     key={e.code}
                     className="grid grid-cols-[3.25rem_1fr] gap-x-4 border-b border-line px-4 py-2.5 transition-colors duration-200 last:border-b-0 hover:bg-white/[0.02] sm:px-6"
                   >
-                    <dt className="font-mono text-[11px] text-infra tabular-nums sm:text-xs">{e.code}</dt>
+                    <dt className="font-mono text-[12px] text-infra tabular-nums sm:text-xs">{e.code}</dt>
                     <dd className="text-[13px] leading-snug text-ink-dim">{e.text}</dd>
                   </div>
                 ))}
@@ -87,7 +87,7 @@ export function Developer() {
               Connection host, port and credentials are issued per account and
               are not published here.
             </p>
-            <ButtonLink href={smpp.docHref} external variant="secondary" size="sm" className="shrink-0">
+            <ButtonLink href={smpp.docHref} external variant="secondary" size="md" className="shrink-0">
               Download specification
             </ButtonLink>
           </div>

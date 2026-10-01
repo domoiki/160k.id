@@ -49,7 +49,7 @@ export default function ApiPage() {
               },
             ].map((b) => (
               <div key={b.k}>
-                <p className="font-mono text-[10px] tracking-[0.14em] text-faint uppercase">{b.k}</p>
+                <p className="font-mono text-[12px] tracking-[0.14em] text-faint uppercase">{b.k}</p>
                 <p className="mt-4 max-w-[40ch] text-sm leading-relaxed text-ink-dim">{b.v}</p>
               </div>
             ))}
@@ -64,7 +64,7 @@ export default function ApiPage() {
             <h2 className="max-w-[20ch] text-h2 font-semibold text-ink">
               Connection parameters
             </h2>
-            <p className="max-w-[46ch] font-mono text-[11px] text-faint md:pb-2">
+            <p className="max-w-[46ch] font-mono text-[12px] text-faint md:pb-2">
               {smpp.title} · rev {smpp.revision} · {smpp.date}
             </p>
           </div>

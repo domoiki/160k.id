@@ -32,7 +32,7 @@ export function MarketData() {
             <div className="mt-8 flex gap-8 border-t border-line pt-6">
               {marketData.penetration.map((p) => (
                 <div key={p.year}>
-                  <p className="font-mono text-[10px] tracking-[0.12em] text-faint uppercase">{p.year}</p>
+                  <p className="font-mono text-[12px] tracking-[0.12em] text-faint uppercase">{p.year}</p>
                   <p className="mt-1.5 text-2xl font-semibold tracking-[-0.02em] text-ink tabular-nums">
                     {p.value}
                   </p>
@@ -75,7 +75,7 @@ export function MarketData() {
                 );
               })}
               <li className="flex items-center justify-between pt-4">
-                <span className="font-mono text-[10px] tracking-[0.12em] text-faint uppercase">Total</span>
+                <span className="font-mono text-[12px] tracking-[0.12em] text-faint uppercase">Total</span>
                 <span className="font-mono text-sm font-medium text-brand tabular-nums">
                   {marketData.total}
                 </span>

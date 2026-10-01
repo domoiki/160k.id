@@ -57,7 +57,7 @@ export function Footer() {
                   address block keeps its original rhythm. */}
               <a
                 href={`mailto:${contact.email}`}
-                className="block w-fit py-1 -my-1 transition-colors hover:text-ink"
+                className="block w-fit py-2.5 transition-colors hover:text-ink"
               >
                 {contact.email}
               </a>
@@ -65,7 +65,7 @@ export function Footer() {
                 href={contact.whatsappHref}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="block w-fit py-1 -my-1 transition-colors hover:text-ink"
+                className="block w-fit py-2.5 transition-colors hover:text-ink"
               >
                 {contact.whatsapp}
               </a>
@@ -81,8 +81,8 @@ export function Footer() {
           <nav aria-label="Footer" className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-8">
             {groups.map((g) => (
               <div key={g.title}>
-                <p className="font-mono text-[10px] tracking-[0.14em] text-faint uppercase">{g.title}</p>
-                <ul className="mt-5 space-y-3">
+                <p className="font-mono text-[12px] tracking-[0.14em] text-faint uppercase">{g.title}</p>
+                <ul className="mt-5 space-y-1">
                   {g.links.map((l) => {
                     const external = l.href.startsWith("http") || l.href.endsWith(".pdf");
                     return (
@@ -92,14 +92,14 @@ export function Footer() {
                             href={l.href}
                             target="_blank"
                             rel="noreferrer noopener"
-                            className="text-sm text-ink-dim transition-colors duration-200 hover:text-ink"
+                            className="inline-block py-2.5 text-sm text-ink-dim transition-colors duration-200 hover:text-ink"
                           >
                             {l.label}
                           </a>
                         ) : (
                           <Link
                             href={l.href}
-                            className="text-sm text-ink-dim transition-colors duration-200 hover:text-ink"
+                            className="inline-block py-2.5 text-sm text-ink-dim transition-colors duration-200 hover:text-ink"
                           >
                             {l.label}
                           </Link>
@@ -116,7 +116,7 @@ export function Footer() {
         {/* ---- partner + base rule ---- */}
         <div className="mt-14 flex flex-col gap-6 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-3">
-            <span className="font-mono text-[10px] tracking-[0.12em] text-faint uppercase">
+            <span className="font-mono text-[12px] tracking-[0.12em] text-faint uppercase">
               EV preferred partner
             </span>
             <Image
@@ -137,14 +137,14 @@ export function Footer() {
                     href={s.href}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="text-xs text-ink-dim transition-colors duration-200 hover:text-ink"
+                    className="inline-block py-2.5 text-xs text-ink-dim transition-colors duration-200 hover:text-ink"
                   >
                     {s.label}
                   </a>
                 </li>
               ))}
             </ul>
-            <p className="font-mono text-[10px] tracking-[0.08em] text-faint">
+            <p className="font-mono text-[12px] tracking-[0.08em] text-faint">
               © {year} {site.legalName}
             </p>
           </div>

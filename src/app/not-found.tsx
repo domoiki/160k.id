@@ -9,7 +9,7 @@ export default function NotFound() {
         <div className="xk-grid xk-grid-fade absolute inset-0 opacity-40" />
       </div>
       <div className="shell">
-        <p className="font-mono text-[0.6875rem] tracking-[0.14em] text-muted uppercase">
+        <p className="font-mono text-[12px] tracking-[0.14em] text-muted uppercase">
           Error 404
         </p>
         <h1 className="mt-6 max-w-[16ch] text-[clamp(2.1rem,1.4rem+3vw,3.5rem)] leading-[1.03] font-semibold tracking-[-0.03em] text-ink">

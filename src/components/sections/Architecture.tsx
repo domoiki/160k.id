@@ -12,9 +12,24 @@ import { cn } from "@/lib/cn";
  * or focusing a node lifts the whole path so the relationship is legible
  * before anything is clicked.
  */
+/* One active node per layer, not one index shared by all of them.
+
+   `signalPath.inbound` and `signalPath.outbound` are both five long, so a bare
+   index made the two layers aliases: hovering "Business applications" (0)
+   lit "Messaging" (0) as well, and dimmed the four nodes either side of it in
+   both grids. The diagram claimed a path that does not exist. The key carries
+   the layer, so hover highlights exactly the node under the pointer. */
+type Layer = "inbound" | "outbound";
+type Active = { layer: Layer; index: number } | null;
+
 export function Architecture() {
-  const [active, setActive] = useState<number | null>(null);
-  const dim = (i: number) => active !== null && active !== i;
+  const [active, setActive] = useState<Active>(null);
+  /* Dim siblings in the hovered node's own layer only. Dimming across layers
+     implied a route between an application and a channel that does not exist —
+     the diagram has no edges, it only shows the two stacks either side of the
+     bus. The endpoint panel is what carries the "this reaches a device" idea. */
+  const dim = (layer: Layer, i: number) =>
+    active !== null && active.layer === layer && active.index !== i;
 
   return (
     <section id="architecture" className="relative scroll-mt-24 py-24 md:py-32">
@@ -24,7 +39,7 @@ export function Architecture() {
 
       <div className="shell">
         <div className="max-w-[58ch]">
-          <p className="mb-5 flex items-center gap-3 font-mono text-[0.6875rem] tracking-[0.14em] text-muted uppercase">
+          <p className="mb-5 flex items-center gap-3 font-mono text-[12px] tracking-[0.14em] text-muted uppercase">
             <span aria-hidden className="inline-block h-px w-6 bg-infra" />
             Signal path
           </p>
@@ -48,9 +63,9 @@ export function Architecture() {
                 key={n}
                 label={n}
                 index={i}
-                active={active === i}
-                onActivate={setActive}
-                dimmed={dim(i)}
+                active={active?.layer === "inbound" && active.index === i}
+                onActivate={(index) => setActive(index === null ? null : { layer: "inbound", index })}
+                dimmed={dim("inbound", i)}
                 tone="neutral"
               />
             ))}
@@ -64,10 +79,10 @@ export function Architecture() {
               className="relative overflow-hidden rounded-[var(--radius-panel)] border border-infra/25 bg-[linear-gradient(180deg,rgba(76,141,255,0.09),rgba(76,141,255,0.02)_60%,transparent)] px-5 py-6 text-center md:px-8"
             >
               <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-infra/70 to-transparent" />
-              <p className="font-mono text-[10px] tracking-[0.16em] text-infra-bright uppercase sm:text-[11px]">
+              <p className="font-mono text-[12px] tracking-[0.16em] text-infra-bright uppercase">
                 {signalPath.core}
               </p>
-              <p className="mx-auto mt-2.5 max-w-[46ch] font-mono text-[11px] leading-relaxed text-muted">
+              <p className="mx-auto mt-2.5 max-w-[46ch] font-mono text-[12px] leading-relaxed text-muted">
                 SMPP v3.4 · bind Transceiver, Transmitter or Receiver ·
                 enquire_link every 60s
               </p>
@@ -85,9 +100,9 @@ export function Architecture() {
                   key={n}
                   label={n}
                   index={i}
-                  active={active === i}
-                  onActivate={setActive}
-                  dimmed={dim(i)}
+                  active={active?.layer === "outbound" && active.index === i}
+                  onActivate={(index) => setActive(index === null ? null : { layer: "outbound", index })}
+                  dimmed={dim("outbound", i)}
                   tone="channel"
                 />
               ))}
@@ -107,7 +122,7 @@ export function Architecture() {
               )}
             >
               <p className="text-lg font-medium text-ink">{signalPath.endpoint}</p>
-              <p className="mt-1.5 font-mono text-[11px] text-faint">on their device</p>
+              <p className="mt-1.5 font-mono text-[12px] text-faint">on their device</p>
             </div>
           </div>
         </div>
@@ -120,7 +135,7 @@ export function Architecture() {
 
 function LayerLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-1 font-mono text-[10px] tracking-[0.16em] text-faint uppercase sm:text-[11px]">
+    <p className="mb-1 font-mono text-[12px] tracking-[0.16em] text-faint uppercase">
       {children}
     </p>
   );
@@ -140,12 +155,16 @@ function Bus({ label }: { label: string }) {
         />
       </span>
       <span className="h-4 w-px bg-gradient-to-t from-transparent to-line-strong" />
-      <span className="absolute bottom-0.5 font-mono text-[9px] tracking-[0.1em] text-faint uppercase sm:text-[10px]">
-        {label}
-      </span>
-    </div>
-  );
-}
+            {/* Full-bleed, not shrink-to-fit. Absolutely positioned inside the flex
+                column, this collapsed to its own content width, and mono text does not
+                wrap — so at 12px the label painted past its own box and the audit read
+                that as a spill. inset-x-0 gives it the bus's width to centre in. */}
+            <span className="absolute inset-x-0 bottom-0.5 text-center font-mono text-[12px] tracking-[0.1em] text-faint uppercase">
+              {label}
+            </span>
+          </div>
+        );
+      }
 
 function Node({
   label,

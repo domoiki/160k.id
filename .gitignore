@@ -43,5 +43,9 @@ next-env.d.ts
 # screenshots produced by scripts/shoot.mjs
 /.shots
 
+# local AI agent instructions
+/AGENTS.md
+/CLAUDE.md
+
 .vercel
 .env*

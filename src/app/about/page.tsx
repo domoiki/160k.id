@@ -45,7 +45,7 @@ export default function AboutPage() {
                   height={21}
                   className="h-6 w-auto opacity-90"
                 />
-                <p className="mt-4 font-mono text-[10px] tracking-[0.12em] text-faint uppercase">
+                <p className="mt-4 font-mono text-[12px] tracking-[0.12em] text-faint uppercase">
                   Preferred partner
                 </p>
               </div>
@@ -56,7 +56,7 @@ export default function AboutPage() {
 
       <section className="border-t border-line py-20 md:py-24">
         <div className="shell">
-          <h2 className="font-mono text-[10px] tracking-[0.16em] text-faint uppercase">Visit us</h2>
+          <h2 className="font-mono text-[12px] tracking-[0.16em] text-faint uppercase">Visit us</h2>
           <p className="mt-6 max-w-[40ch] text-lede text-ink-dim">
             {contact.addressLines[0]}, {contact.addressLines[1]}, {contact.addressLines[2]}
           </p>

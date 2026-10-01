@@ -63,6 +63,21 @@ reads as an engineering tool, which suits infrastructure positioning.
 Type scale is defined as tokens (`--text-display`, `--text-h2`, `--text-h3`,
 `--text-lede`) using `clamp()` so headings scale fluidly between breakpoints.
 
+**12px is the floor for every piece of text on the site.** The eyebrow and
+metadata labels started at 9–11px, which the measured audit flagged as
+`TINY-TEXT` on every route: uppercase mono at 11px is legible only at desktop
+pixel density, and the wide tracking that makes it look intentional at 12px is
+exactly what makes it hard to read at 11. Every one is now `text-[12px]`, and
+`--text-label` moved from `0.6875rem` to `0.75rem` to match.
+
+### Touch targets
+
+Interactive elements clear **40px**, and 44px where the control is not inside a
+dense bar. Nav links are `h-10` (was `h-9`), `Button` `md` is `h-11` (was `h-10`),
+and footer, breadcrumb and social links carry `py-2` (they were 16–18px tall
+inline). `sm` stays 32px because it only ever appears inside the desktop nav bar,
+where the surrounding links set the row height.
+
 ### Radius
 
 A deliberate scale, not one value everywhere: `2px` (buttons, technical
@@ -217,6 +232,93 @@ layout rather than asserting about it.
 npm run shoot -- http://127.0.0.1:3951/          # -> .shots/ (gitignored)
 npm run shoot -- http://127.0.0.1:3951/ --vp=mobile
 ```
+
+---
+
+## Interaction
+
+Three components hold all the state on the site. Each one is covered by a
+script rather than by eye.
+
+### Desktop nav — `scripts/verify-nav.mjs`
+
+The "Products" flyout has to work four ways at once — hover, keyboard, click and
+tab-past — and the bug that once broke it was invisible to any single check. The
+trigger is a `<Link>` to `/products`, not a `<button>` that toggles: a pointer
+click focuses a button on mousedown, so opening on focus and toggling on click
+opened and shut the menu inside one gesture. A link cannot cancel what hovering
+did, so the conflict is gone rather than reordered. `Escape` returns focus to the
+trigger instead of dropping it on `<body>`.
+
+The script uses `Input.dispatchMouseEvent` / `Input.dispatchKeyEvent` so the
+events are trusted, and waits for a React fiber before asserting — an unhydrated
+page swallows them all identically, which looks exactly like a broken menu.
+
+```
+7/7 scenarios passed
+```
+
+#### The gap — `scripts/verify-nav-traverse.mjs`
+
+`verify-nav.mjs` passed 7/7 while the menu was still unusable by hand, because it
+moves the pointer to the panel in one jump. A real pointer crosses the 12px band
+between the trigger and the panel, and that crossing is where the menu died.
+
+Two separate causes, both measured:
+
+| | |
+|---|---|
+| dead zone | the 12px gap belonged to neither the trigger nor the panel |
+| grace period | `140ms` — less than the ~200ms a pointer needs to cross 12px |
+
+```
+mouseleave fired at   5ms
+flyout closed  at 154ms
+```
+
+So the menu always vanished before the pointer arrived, which is exactly the
+report: it disappears before you can click. The gap is now `top-full` with the
+offset in `padding-top`, so the band is inside the hover target rather than a
+hole in it, and the grace period is 320ms. `onMouseEnter` on the panel cancels
+the timer if the pointer arrives late.
+
+This script walks the gap in steps and asserts the flyout is still open at every
+one. Run against the pre-fix geometry it fails at **y=59 — three pixels below the
+trigger**; against the fix it passes all six steps.
+
+```
+3/3 scenarios passed
+```
+
+#### Position — `scripts/verify-nav-position.mjs`
+
+Closing the gap moved the panel's offset from `top` to padding, so this asserts
+the panel did not move: same 480px width, still centred on the trigger, still 12px
+below it, fully on screen, all six products, no overflow. It earned its place
+immediately — it caught a 48px misalignment introduced while making the fix.
+
+```
+6/6 checks passed
+```
+
+### Architecture — one active node per layer
+
+`signalPath.inbound` and `signalPath.outbound` are both five long, so a bare
+index number made the two layers aliases of each other: hovering "Business
+applications" (0) also lit "Messaging" (0) and dimmed four unrelated nodes in
+both grids. The diagram asserted a path that does not exist. The active node is
+now `{ layer, index }`, and dimming applies only to siblings in the hovered
+node's own layer — the diagram has no edges, only two stacks either side of the
+bus, so dimming across layers would imply one.
+
+### Contact form — `src/components/sections/ContactForm.tsx`
+
+No backend by design, so submit composes a prefilled email to the published
+support address instead of failing silently. Validation is explicit rather than
+left to the browser: `required` alone blocks submission without ever saying why.
+Errors are announced through `aria-invalid` + `aria-describedby`, focus moves
+to the first invalid field on submit, and each error clears the moment its field
+becomes valid.
 
 ---
 

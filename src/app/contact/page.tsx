@@ -44,7 +44,7 @@ export default function ContactPage() {
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-10">
             {/* ---- channels ---- */}
             <div className="lg:col-span-5">
-              <h2 className="font-mono text-[10px] tracking-[0.16em] text-faint uppercase">
+              <h2 className="font-mono text-[12px] tracking-[0.16em] text-faint uppercase">
                 Direct channels
               </h2>
               <ul className="mt-7 border-t border-line">
@@ -57,7 +57,7 @@ export default function ContactPage() {
                         : {})}
                       className="group block"
                     >
-                      <span className="font-mono text-[10px] tracking-[0.12em] text-faint uppercase">
+                      <span className="font-mono text-[12px] tracking-[0.12em] text-faint uppercase">
                         {c.label}
                       </span>
                       <span className="mt-2 block text-lg text-ink transition-colors duration-200 group-hover:text-brand">
@@ -70,7 +70,7 @@ export default function ContactPage() {
               </ul>
 
               <div className="mt-10">
-                <h2 className="font-mono text-[10px] tracking-[0.16em] text-faint uppercase">
+                <h2 className="font-mono text-[12px] tracking-[0.16em] text-faint uppercase">
                   Office
                 </h2>
                 <address className="mt-5 text-[0.9375rem] leading-relaxed text-ink-dim not-italic">
@@ -86,7 +86,7 @@ export default function ContactPage() {
                   href={contact.mapsHref}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="mt-5 inline-flex items-center gap-2 text-sm text-ink-dim transition-colors hover:text-brand"
+                  className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm text-ink-dim transition-colors hover:text-brand"
                 >
                   Open in Maps
                   <svg width="13" height="9" viewBox="0 0 13 9" fill="none" aria-hidden>
@@ -97,17 +97,17 @@ export default function ContactPage() {
               </div>
 
               <div className="mt-10">
-                <h2 className="font-mono text-[10px] tracking-[0.16em] text-faint uppercase">
+                <h2 className="font-mono text-[12px] tracking-[0.16em] text-faint uppercase">
                   Follow
                 </h2>
-                <ul className="mt-5 flex gap-5">
+                <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-1">
                   {social.map((s) => (
                     <li key={s.label}>
                       <a
                         href={s.href}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="text-sm text-ink-dim transition-colors hover:text-ink"
+                        className="inline-block py-2.5 text-sm text-ink-dim transition-colors hover:text-ink"
                       >
                         {s.label}
                       </a>
@@ -119,7 +119,7 @@ export default function ContactPage() {
 
             {/* ---- form ---- */}
             <div className="lg:col-span-7">
-              <h2 className="font-mono text-[10px] tracking-[0.16em] text-faint uppercase">
+              <h2 className="font-mono text-[12px] tracking-[0.16em] text-faint uppercase">
                 Send a message
               </h2>
               <div className="mt-7">

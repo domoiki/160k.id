@@ -14,7 +14,7 @@ export function Company() {
         <div className="grid gap-14 lg:grid-cols-12 lg:gap-10">
           {/* ---- story ---- */}
           <div className="lg:col-span-6">
-            <p className="mb-5 flex items-center gap-3 font-mono text-[0.6875rem] tracking-[0.14em] text-muted uppercase">
+            <p className="mb-5 flex items-center gap-3 font-mono text-[12px] tracking-[0.14em] text-muted uppercase">
               <span aria-hidden className="inline-block h-px w-6 bg-brand" />
               The company
             </p>
@@ -53,7 +53,7 @@ export function Company() {
           <div className="flex flex-col gap-6 lg:col-span-6 lg:pt-16">
             <blockquote className="relative rounded-[var(--radius-panel)] border border-line bg-surface p-7 md:p-8">
               <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-brand/70 to-transparent" />
-              <p className="font-mono text-[10px] tracking-[0.16em] text-brand uppercase">Our vision</p>
+              <p className="font-mono text-[12px] tracking-[0.16em] text-brand uppercase">Our vision</p>
               <p className="mt-5 text-xl leading-[1.35] font-medium tracking-[-0.015em] text-ink md:text-2xl">
                 {vision}
               </p>
@@ -61,7 +61,7 @@ export function Company() {
 
             <blockquote className="relative rounded-[var(--radius-panel)] border border-line bg-surface p-7 md:p-8">
               <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-infra/70 to-transparent" />
-              <p className="font-mono text-[10px] tracking-[0.16em] text-infra-bright uppercase">
+              <p className="font-mono text-[12px] tracking-[0.16em] text-infra-bright uppercase">
                 Our mission
               </p>
               <p className="mt-5 text-xl leading-[1.35] font-medium tracking-[-0.015em] text-ink md:text-2xl">
@@ -70,7 +70,7 @@ export function Company() {
             </blockquote>
 
             <div className="rounded-[var(--radius-panel)] border border-line bg-surface/60 p-7 md:p-8">
-              <p className="font-mono text-[10px] tracking-[0.16em] text-faint uppercase">Registered entity</p>
+              <p className="font-mono text-[12px] tracking-[0.16em] text-faint uppercase">Registered entity</p>
               <p className="mt-4 text-base text-ink">{site.legalName}</p>
               <p className="mt-2 text-sm text-ink-dim">
                 Jl. Jembatan Tiga Raya, Jakarta Utara 14440, Indonesia

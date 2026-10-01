@@ -86,7 +86,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
                   i === 0 ? "sm:pl-0" : ""
                 }`}
               >
-                <dt className="font-mono text-[10px] tracking-[0.12em] text-faint uppercase">
+                <dt className="font-mono text-[12px] tracking-[0.12em] text-faint uppercase">
                   {m.label}
                 </dt>
                 <dd className="mt-2 font-mono text-sm text-ink">{m.value}</dd>
@@ -122,7 +122,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       {example ? (
         <section className="pb-20 md:pb-28">
           <div className="shell">
-            <p className="mb-5 font-mono text-[10px] tracking-[0.16em] text-faint uppercase">
+            <p className="mb-5 font-mono text-[12px] tracking-[0.16em] text-faint uppercase">
               Worked example — {example.label}
             </p>
             <div className="max-w-md rounded-[var(--radius-panel)] border border-line bg-surface p-6">
@@ -182,7 +182,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
         <div className="shell">
           <div className="flex flex-col gap-6 rounded-[var(--radius-panel)] border border-line bg-surface p-7 md:flex-row md:items-center md:justify-between md:p-9">
             <div className="max-w-[52ch]">
-              <p className="font-mono text-[10px] tracking-[0.16em] text-infra uppercase">
+              <p className="font-mono text-[12px] tracking-[0.16em] text-infra uppercase">
                 SMPP v{smpp.version}
               </p>
               <h2 className="mt-3 text-h3 font-semibold text-ink">
@@ -203,7 +203,7 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
       {/* ---- other capabilities ---- */}
       <section aria-labelledby="others-heading" className="border-t border-line py-20 md:py-24">
         <div className="shell">
-          <h2 id="others-heading" className="font-mono text-[10px] tracking-[0.16em] text-faint uppercase">
+          <h2 id="others-heading" className="font-mono text-[12px] tracking-[0.16em] text-faint uppercase">
             Other capabilities
           </h2>
           <ul className="mt-8 flex flex-wrap gap-2.5">
